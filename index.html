@@ -51,19 +51,23 @@
         });
 
         const text = await response.text();
-        console.log(text); // should be "success"
 
-        document.getElementById("message").innerHTML =
-          "Thank you! A confirmation email has been sent to " + data.email + ".";
-
-        form.reset();
-      } catch(err) {
-        console.error(err);
-        document.getElementById("message").innerText =
-          "Submission failed. Please try again.";
-      }
-    });
-  </script>
+    if (text.trim() === "success") {
+      document.getElementById("message").innerText =
+        "Thank you! A confirmation email has been sent to " + data.email;
+      form.reset();
+    } else {
+      // Display the actual error returned by Apps Script
+      document.getElementById("message").innerText =
+        "Submission failed. Error from server: " + text;
+    }
+  } catch (err) {
+    // Network or fetch-level error
+    document.getElementById("message").innerText =
+      "Submission failed. Fetch/network error: " + err.message;
+  }
+});
+</script>
 
 </body>
 </html>
