@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Conference Registration</title>
@@ -13,7 +13,9 @@
   </style>
 </head>
 <body>
+
   <h2>Conference Registration Form</h2>
+
   <form id="registrationForm">
     <label>First Name</label>
     <input type="text" name="first_name" required>
@@ -33,7 +35,7 @@
     const form = document.getElementById("registrationForm");
 
     form.addEventListener("submit", async function(e) {
-      e.preventDefault(); // prevents page reload
+      e.preventDefault(); // prevent page reload
 
       const data = {
         first_name: form.first_name.value,
@@ -41,8 +43,11 @@
         email: form.email.value
       };
 
+      // Replace this with your deployed Google Apps Script Web App URL
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxSSlKaYKrCCWQvUO6x1U79yze519AGmE-Q1EwaIcrtYK30DcP-EfGQUHAhLRMje3I/exec";
+
       try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbxSRd-ULE8a10O9th-PaSnBfGb86KdsZuoDlDEutXPtHhLSyKtH2S6IboWzFplt3jLV/exec', {
+        const response = await fetch(SCRIPT_URL, {
           method: "POST",
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
@@ -50,22 +55,23 @@
 
         const text = await response.text();
 
-    if (text.trim() === "success") {
-      document.getElementById("message").innerText =
-        "Thank you! A confirmation email has been sent to " + data.email;
-      form.reset();
-    } else {
-      // Display the actual error returned by Apps Script
-      document.getElementById("message").innerText =
-        "Submission failed. Error from server: " + text;
-    }
-  } catch (err) {
-    // Network or fetch-level error
-    document.getElementById("message").innerText =
-      "Submission failed. Fetch/network error: " + err.message;
-  }
-});
-</script>
+        if (text.trim() === "success") {
+          document.getElementById("message").innerText =
+            "Thank you! A confirmation email has been sent to " + data.email + ".";
+          form.reset();
+        } else {
+          // Display the actual error returned by Apps Script
+          document.getElementById("message").innerText =
+            "Submission failed. Error from server: " + text;
+        }
+
+      } catch (err) {
+        // Network/fetch-level error
+        document.getElementById("message").innerText =
+          "Submission failed. Fetch/network error: " + err.message;
+      }
+    });
+  </script>
 
 </body>
 </html>
