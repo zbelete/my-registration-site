@@ -1,77 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Conference Registration</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; }
-    form { max-width: 400px; }
-    label { display: block; margin-top: 10px; }
-    input { width: 100%; padding: 8px; margin-top: 4px; }
-    button { margin-top: 20px; padding: 10px 20px; }
-    #message { margin-top: 20px; font-weight: bold; color: green; }
-  </style>
+    <title>Registration Form</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 400px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        #status { margin-top: 15px; color: green; display: none; }
+    </style>
 </head>
 <body>
 
-  <h2>Conference Registration Form</h2>
+    <h2>Join the Program</h2>
+    <form id="registrationForm">
+        <input type="text" name="FirstName" placeholder="First Name" required>
+        <input type="text" name="LastName" placeholder="Last Name" required>
+        <input type="email" name="Email" placeholder="Email Address" required>
+        <button type="submit" id="submitBtn">Submit Details</button>
+    </form>
+    <div id="status">Submitting... Please wait.</div>
 
-  <form id="registrationForm">
-    <label>First Name</label>
-    <input type="text" name="first_name" required>
+    <script>
+        const scriptURL = 'YOUR_SCRIPT_URL'; // <--- PASTE YOUR URL HERE
+        const form = document.getElementById('registrationForm');
+        const status = document.getElementById('status');
 
-    <label>Last Name</label>
-    <input type="text" name="last_name" required>
-
-    <label>Email</label>
-    <input type="email" name="email" required>
-
-    <button type="submit">Submit</button>
-  </form>
-
-  <p id="message"></p>
-
-  <script>
-    const form = document.getElementById("registrationForm");
-
-    form.addEventListener("submit", async function(e) {
-      e.preventDefault(); // prevent page reload
-
-      const data = {
-        first_name: form.first_name.value,
-        last_name: form.last_name.value,
-        email: form.email.value
-      };
-
-      // Replace this with your deployed Google Apps Script Web App URL
-      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxSSlKaYKrCCWQvUO6x1U79yze519AGmE-Q1EwaIcrtYK30DcP-EfGQUHAhLRMje3I/exec";
-
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            status.style.display = 'block';
+            status.innerText = 'Submitting...';
+            
+            // Send data to Google Apps Script
+            fetch(scriptURL, { 
+                method: 'POST', 
+                body: new FormData(form)
+            })
+            .then(response => {
+                status.innerText = 'Success! Check your email.';
+                form.reset();
+            })
+            .catch(error => {
+                status.innerText = 'Error! Try again later.';
+                console.error('Error!', error.message);
+            });
         });
-
-        const text = await response.text();
-
-        if (text.trim() === "success") {
-          document.getElementById("message").innerText =
-            "Thank you! A confirmation email has been sent to " + data.email + ".";
-          form.reset();
-        } else {
-          // Display the actual error returned by Apps Script
-          document.getElementById("message").innerText =
-            "Submission failed. Error from server: " + text;
-        }
-
-      } catch (err) {
-        // Network/fetch-level error
-        document.getElementById("message").innerText =
-          "Submission failed. Fetch/network error: " + err.message;
-      }
-    });
-  </script>
+    </script>
 
 </body>
 </html>
